@@ -1,5 +1,5 @@
 # Functions Defined in Data Preparation Exercises
-
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
 def clean_iris(iris):
@@ -18,9 +18,10 @@ def prep_iris(iris):
     return train, validate, test
 
 def clean_titanic(titanic):
-    titanic = titanic.drop(columns=['passenger_id', 'pclass', 'embarked'])
+    titanic = titanic.drop(columns=['passenger_id', 'class', 'embarked', 'deck'])
     titanic = titanic.drop_duplicates()
-    dummies = pd.get_dummies(titanic[['class', 'embark_town', 'sex']], drop_first=True)
+    titanic = titanic.dropna()
+    dummies = pd.get_dummies(titanic[['embark_town', 'sex']], drop_first=True)
     titanic = pd.concat([titanic, dummies], axis=1)
     return titanic
 def split_titanic(titanic):
@@ -33,8 +34,9 @@ def prep_titanic(titanic):
     return train, validate, test
 
 def clean_telco(telco):
-    telco = telco.drop(columns=['payment_type_id', 'internet_service_type_id', 'contract_type_id'])
+    telco = telco.drop(columns=['payment_type_id', 'internet_service_type_id', 'contract_type_id', 'customer_id'])
     telco = telco.drop_duplicates()
+    telco = telco.dropna()
     dummies = pd.get_dummies(telco[['gender', 'contract_type', 'internet_service_type', 'payment_type']], drop_first=True)
     telco = pd.concat([telco, dummies], axis=1)
     return telco
