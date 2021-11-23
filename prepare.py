@@ -36,9 +36,17 @@ def prep_titanic(titanic):
 def clean_telco(telco):
     telco = telco.drop(columns=['payment_type_id', 'internet_service_type_id', 'contract_type_id', 'customer_id'])
     telco = telco.drop_duplicates()
-    telco = telco.dropna()
-    dummies = pd.get_dummies(telco[['gender', 'contract_type', 'internet_service_type', 'payment_type']], drop_first=True)
+    telco = telco[telco.total_charges != ' ']
+    telco.total_charges = telco.total_charges.astype(float)
+    dummies = pd.get_dummies(telco[telco.select_dtypes('O').columns], drop_first=True)
     telco = pd.concat([telco, dummies], axis=1)
+    telco.drop(columns=telco.select_dtypes('O').columns, inplace=True)
+    telco.rename(columns={'gender_Male':'is_male',
+                      'partner_Yes':'has_partner',
+                      'dependents_Yes':'has_dependents',
+                      'phone_service_Yes':'has_phone_service',
+                      'paperless_billing_Yes':'has_paperless_billing',
+                      'churn_Yes':'has_churned'}, inplace=True)
     return telco
 def split_telco(telco):
     train, test = train_test_split(telco, test_size=0.2, random_state=123, stratify=telco.churn)
